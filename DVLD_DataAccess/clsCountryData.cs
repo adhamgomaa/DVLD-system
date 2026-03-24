@@ -13,28 +13,30 @@ namespace DVLD_DataAccess
         public static bool FindCountry(int countryId, ref string countryName)
         {
             bool isFound = false;
-            SqlConnection connection = new SqlConnection(clsDataAccessSettings.ConnectionString);
-            string query = "SELECT * FROM Countries Where CountryID = @id";
-            SqlCommand command = new SqlCommand(query, connection);
-            command.Parameters.AddWithValue("@id", countryId);
             try
             {
-                connection.Open();
-                SqlDataReader reader = command.ExecuteReader();
-                if (reader.Read())
+                using (SqlConnection connection = new SqlConnection(clsDataAccessSettings.ConnectionString))
                 {
-                    isFound = true;
-                    countryName = (string)reader["CountryName"];
+                    using (SqlCommand command = new SqlCommand("SP_FindCountryById", connection))
+                    {
+                        command.CommandType = CommandType.StoredProcedure;
+                        command.Parameters.AddWithValue("@countryId", countryId);
+                        connection.Open();
+                        using (SqlDataReader reader = command.ExecuteReader())
+                        {
+                            if (reader.Read())
+                            {
+                                isFound = true;
+                                countryName = (string)reader["CountryName"];
+                            }
+                        }
+                    }
                 }
-                reader.Close();
             }
-            catch (Exception ex)
+            catch (SqlException ex)
             {
                 isFound = false;
-            }
-            finally
-            {
-                connection.Close();
+                clsLogger.LoggingAllExepctions(ex.Message, System.Diagnostics.EventLogEntryType.Error);
             }
             return isFound;
         }
@@ -42,28 +44,30 @@ namespace DVLD_DataAccess
         public static bool FindCountry(string countryName, ref int countryId)
         {
             bool isFound = false;
-            SqlConnection connection = new SqlConnection(clsDataAccessSettings.ConnectionString);
-            string query = "SELECT * FROM Countries Where CountryName = @name";
-            SqlCommand command = new SqlCommand(query, connection);
-            command.Parameters.AddWithValue("@name", countryName);
             try
             {
-                connection.Open();
-                SqlDataReader reader = command.ExecuteReader();
-                if (reader.Read())
+                using (SqlConnection connection = new SqlConnection(clsDataAccessSettings.ConnectionString))
                 {
-                    isFound = true;
-                    countryId = (int)reader["CountryID"];
+                    using (SqlCommand command = new SqlCommand("SP_FindCountryByName", connection))
+                    {
+                        command.CommandType= CommandType.StoredProcedure;
+                        command.Parameters.AddWithValue("@name", countryName);
+                        connection.Open();
+                        using (SqlDataReader reader = command.ExecuteReader())
+                        {
+                            if (reader.Read())
+                            {
+                                isFound = true;
+                                countryId = (int)reader["CountryID"];
+                            }
+                        }
+                    }
                 }
-                reader.Close();
             }
-            catch (Exception ex)
+            catch (SqlException ex)
             {
                 isFound = false;
-            }
-            finally
-            {
-                connection.Close();
+                clsLogger.LoggingAllExepctions(ex.Message, System.Diagnostics.EventLogEntryType.Error);
             }
             return isFound;
         }
@@ -71,25 +75,25 @@ namespace DVLD_DataAccess
         public static DataTable GetCountries()
         {
             DataTable dt = new DataTable();
-            SqlConnection connection = new SqlConnection(clsDataAccessSettings.ConnectionString);
-            string query = "SELECT * FROM Countries";
-            SqlCommand command = new SqlCommand(query, connection);
             try
             {
-                connection.Open();
-                SqlDataReader reader = command.ExecuteReader();
-                if (reader.HasRows)
+                using (SqlConnection connection = new SqlConnection(clsDataAccessSettings.ConnectionString))
                 {
-                    dt.Load(reader);
+                    using (SqlCommand command = new SqlCommand("SP_GetAllCountries", connection))
+                    {
+                        command.CommandType = CommandType.StoredProcedure;
+                        connection.Open();
+                        using (SqlDataReader reader = command.ExecuteReader())
+                        {
+                            if (reader.HasRows)
+                                dt.Load(reader);
+                        }
+                    }
                 }
-                reader.Close();
             }
-            catch (Exception ex)
+            catch (SqlException ex)
             {
-            }
-            finally
-            {
-                connection.Close();
+                clsLogger.LoggingAllExepctions(ex.Message, System.Diagnostics.EventLogEntryType.Error);
             }
             return dt;
         }

@@ -43,7 +43,7 @@ namespace DVLD_Business
 
         private bool _AddNewLicense()
         {
-            this.InternationalID = clsInternationalLicenseData.AddNewInternationalLicense(base.appID, DriverID, IssueDate, ExpirationDate, base.userId, IsActive, LocalLicenseID);
+            this.InternationalID = clsInternationalLicenseData.AddNewInternationalLicense(base.personId, base.types, base.status, base.statusDate, base.fees, DriverID, ExpirationDate, base.userId, IsActive, LocalLicenseID);
             return this.InternationalID != -1;
         }
 
@@ -94,9 +94,7 @@ namespace DVLD_Business
 
         public new bool Save()
         {
-            if (!base.Save()) return false;
             return _AddNewLicense();
         }
-
     }
 }

@@ -29,7 +29,7 @@
         private void InitializeComponent()
         {
             this.ctrlApplicationInfo1 = new DVLD_Presentation.Controls.ctrlApplicationInfo();
-            this.textBox1 = new System.Windows.Forms.TextBox();
+            this.txtNotes = new System.Windows.Forms.TextBox();
             this.label7 = new System.Windows.Forms.Label();
             this.btnSave = new System.Windows.Forms.Button();
             this.btnClose = new System.Windows.Forms.Button();
@@ -44,13 +44,13 @@
             this.ctrlApplicationInfo1.Size = new System.Drawing.Size(775, 406);
             this.ctrlApplicationInfo1.TabIndex = 0;
             // 
-            // textBox1
+            // txtNotes
             // 
-            this.textBox1.Location = new System.Drawing.Point(92, 417);
-            this.textBox1.Multiline = true;
-            this.textBox1.Name = "textBox1";
-            this.textBox1.Size = new System.Drawing.Size(672, 103);
-            this.textBox1.TabIndex = 75;
+            this.txtNotes.Location = new System.Drawing.Point(92, 417);
+            this.txtNotes.Multiline = true;
+            this.txtNotes.Name = "txtNotes";
+            this.txtNotes.Size = new System.Drawing.Size(672, 103);
+            this.txtNotes.TabIndex = 75;
             // 
             // label7
             // 
@@ -95,7 +95,7 @@
             this.ClientSize = new System.Drawing.Size(775, 583);
             this.Controls.Add(this.btnSave);
             this.Controls.Add(this.btnClose);
-            this.Controls.Add(this.textBox1);
+            this.Controls.Add(this.txtNotes);
             this.Controls.Add(this.label7);
             this.Controls.Add(this.ctrlApplicationInfo1);
             this.Font = new System.Drawing.Font("Microsoft Sans Serif", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
@@ -113,7 +113,7 @@
         #endregion
 
         private Controls.ctrlApplicationInfo ctrlApplicationInfo1;
-        private System.Windows.Forms.TextBox textBox1;
+        private System.Windows.Forms.TextBox txtNotes;
         private System.Windows.Forms.Label label7;
         private System.Windows.Forms.Button btnSave;
         private System.Windows.Forms.Button btnClose;

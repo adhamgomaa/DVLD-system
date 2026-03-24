@@ -39,15 +39,13 @@ namespace DVLD_Presentation.App.Licenses
         {
             _internationalLicense = new clsInternationalLicense();
             _internationalLicense.personId = ctrlFilterDriverLicense1.SelectedLicenseInfo.driverInfo.personID;
-            _internationalLicense.date = DateTime.Now;
             _internationalLicense.status = 3;
-            _internationalLicense.statusDate = _internationalLicense.date;
+            _internationalLicense.statusDate = DateTime.Now;
             _internationalLicense.fees = clsAppTypes.FindType((int)clsApp.enApplicationType.NewInternationalLicense).fees;
             _internationalLicense.userId = clsGlobal.CurrentUser.id;
 
             _internationalLicense.DriverID = ctrlFilterDriverLicense1.SelectedLicenseInfo.driverID;
             _internationalLicense.LocalLicenseID = ctrlFilterDriverLicense1.LicenseID;
-            _internationalLicense.IssueDate = DateTime.Now;
             _internationalLicense.ExpirationDate = DateTime.Now.AddYears(1);
             _internationalLicense.IsActive = true;
         }

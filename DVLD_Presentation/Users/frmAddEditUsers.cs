@@ -172,8 +172,8 @@ namespace DVLD_Presentation.Users
                 {
                     MessageBox.Show("This User is already exists", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
                     ctrlFilterPersonInfo1.FilterFoucs();
+                    return;
                 }
-                return;
             }
             if (_user.Save())
             {

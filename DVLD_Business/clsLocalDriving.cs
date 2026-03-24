@@ -32,7 +32,7 @@ namespace DVLD_Business
         }
 
         private clsLocalDriving(int localId, int appId, int personId, DateTime date, int types, byte status, DateTime statusDate, 
-            decimal fees, int userId, int classId) : base(appId, personId, date,  types, status, statusDate, fees, userId)
+            decimal fees, int userId, int classId) : base(appId, personId, date, types, status, statusDate, fees, userId)
         {
             LocalId = localId;
             this.classId = classId;
@@ -42,13 +42,13 @@ namespace DVLD_Business
 
         private bool _AddNewLocal()
         {
-            this.LocalId = clsLocalDrivingData.AddNewLocal(base.appID, classId);
+            this.LocalId = clsLocalDrivingData.AddNewLocal(base.personId, base.types, base.status, base.statusDate, base.fees, base.userId, classId);
             return this.LocalId != -1;
         }
 
         private bool _UpdateLocal()
         {
-            return clsLocalDrivingData.UpdateLocal(LocalId, base.appID, classId);
+            return clsLocalDrivingData.UpdateLocal(base.personId, base.types, base.status, base.statusDate, base.fees, base.userId, LocalId, base.appID, classId);
         }
 
         public static bool CheckPersonHasSameClass(int personId, int classId)
@@ -90,15 +90,11 @@ namespace DVLD_Business
 
         public new bool Delete()
         {
-            if(!clsLocalDrivingData.DeleteLocal(this.LocalId))
-                return false;
-            return base.Delete();
+            return clsLocalDrivingData.DeleteLocal(this.LocalId, this.appID);
         }
 
         public new bool Save()
         {
-            if(!base.Save()) return false;
-
             switch(mode)
             {
                 case enMode.add:
@@ -185,7 +181,6 @@ namespace DVLD_Business
             FirstLicense.notes = notes;
             FirstLicense.appID = this.appID;
             FirstLicense.classID = this.classId;
-            FirstLicense.issueDate = DateTime.Now;
             FirstLicense.expiredDate = FirstLicense.issueDate.AddYears(this.LicenseClassInfo.length);
             FirstLicense.fees = this.LicenseClassInfo.fees;
             FirstLicense.isActive = true;
@@ -193,12 +188,9 @@ namespace DVLD_Business
             FirstLicense.userID = createdByUserId;
 
             if(FirstLicense.Save())
-            {
-                // change status for application to complete
-                this.SetComplete();
                 return FirstLicense.licenseID;
-            }
-            else return -1;
+
+            return -1;
         }
     }
 }

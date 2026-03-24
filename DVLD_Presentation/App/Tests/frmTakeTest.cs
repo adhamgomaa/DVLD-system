@@ -17,7 +17,6 @@ namespace DVLD_Presentation.App.Tests
     {
         private clsTestType.enTestType _testTypeId = clsTestType.enTestType.VisionTest;
         private int _AppointmentId; 
-        private clsTestAppointment _Appointment;
         private clsTest _test;
         public frmTakeTest(clsTestType.enTestType testTypeId, int appointmentId)
         {
@@ -51,7 +50,6 @@ namespace DVLD_Presentation.App.Tests
             else
             {
                 _test = new clsTest();
-                _Appointment = clsTestAppointment.FindAppointment(_AppointmentId);
             }
         }
 
@@ -64,8 +62,6 @@ namespace DVLD_Presentation.App.Tests
             _test.notes = textBox1.Text.Trim();
             _test.appointmentID = _AppointmentId;
             _test.userId = clsGlobal.CurrentUser.id;
-            _Appointment.isLocked = true;
-            _Appointment.Save();
         }
 
         private void btnSave_Click(object sender, EventArgs e)

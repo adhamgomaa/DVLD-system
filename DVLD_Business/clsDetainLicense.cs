@@ -51,28 +51,13 @@ namespace DVLD_Business
 
         private bool _AddNewDetainLicense()
         {
-            this.detainID = clsDetainLicenseData.AddNewDetain(licenseID, detainDate, fees, userID);
+            this.detainID = clsDetainLicenseData.AddNewDetain(licenseID, fees, userID);
             return this.detainID != -1;
         }
 
         private bool _UpdateDetainLicense()
         {
             return clsDetainLicenseData.UpdateDetainLicense(detainID, licenseID, detainDate, fees, userID);
-        }
-
-        public static clsDetainLicense FindDetainLicense(int id)
-        {
-            int licenseId = -1, userId = -1;
-            int releaseByUserId = -1, releaseAppId = -1;
-            DateTime detainDate = DateTime.Now;
-            DateTime releaseDate = DateTime.MaxValue;
-            decimal fees = 0;
-            bool isRelease = false;
-            if (clsDetainLicenseData.FindLicense(id, ref licenseId, ref detainDate, ref fees, ref userId, ref isRelease, ref releaseDate, ref releaseByUserId,
-                ref releaseAppId))
-                return new clsDetainLicense(id, licenseId, detainDate, fees, userId, isRelease, releaseDate, releaseByUserId, releaseAppId);
-            else
-                return null;
         }
 
         public static clsDetainLicense FindDetainLicenseByLicenseID(int licenseId)
@@ -95,9 +80,9 @@ namespace DVLD_Business
             return clsDetainLicenseData.GetDetainedLicenses().DefaultView;
         }
 
-        public bool ReleaseDetainedLicense(int releaseByUserId, int releaseAppId)
+        public int ReleaseDetainedLicense(int personId, int appType, int status, DateTime statusDate, decimal fees, int releaseByUserId)
         {
-            return clsDetainLicenseData.ReleaseDetainedLicense(this.detainID, releaseByUserId, releaseAppId);
+            return clsDetainLicenseData.ReleaseDetainedLicense(personId, appType, status, statusDate, fees, this.detainID, releaseByUserId);
         }
 
         public static bool IsDetainedLicense(int licenseId)

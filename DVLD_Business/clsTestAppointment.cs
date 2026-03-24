@@ -63,7 +63,7 @@ namespace DVLD_Business
 
         private bool _AddNewAppointment()
         {
-            this.appointmentId = clsTestAppointmentData.AddNewAppointment((int)testTypeId, localId, date, fees, userId, isLocked, retake);
+            this.appointmentId = clsTestAppointmentData.AddNewAppointment((int)testTypeId, localId, date, fees, userId, retake);
             return this.appointmentId != -1;
         }
 

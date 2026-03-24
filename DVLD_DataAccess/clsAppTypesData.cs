@@ -13,29 +13,31 @@ namespace DVLD_DataAccess
         public static bool FindTypes(int id, ref string title, ref decimal fees)
         {
             bool isFound = false;
-            SqlConnection connection = new SqlConnection(clsDataAccessSettings.ConnectionString);
-            string query = "SELECT * FROM ApplicationTypes WHERE ApplicationTypesID = @id";
-            SqlCommand command = new SqlCommand(query, connection);
-            command.Parameters.AddWithValue("@id", id);
             try
             {
-                connection.Open();
-                SqlDataReader reader = command.ExecuteReader();
-                if (reader.Read())
+                using (SqlConnection connection = new SqlConnection(clsDataAccessSettings.ConnectionString))
                 {
-                    isFound = true;
-                    title = (string)reader["ApplicationTypesTitle"];
-                    fees = (decimal)reader["ApplicationFees"];
+                    using (SqlCommand command = new SqlCommand("SP_FindAppTypeById", connection))
+                    {
+                        command.CommandType = CommandType.StoredProcedure;
+                        command.Parameters.AddWithValue("@typeId", id);
+                        connection.Open();
+                        using (SqlDataReader reader = command.ExecuteReader())
+                        {
+                            if (reader.Read())
+                            {
+                                isFound = true;
+                                title = (string)reader["ApplicationTypesTitle"];
+                                fees = (decimal)reader["ApplicationFees"];
+                            }
+                        }
+                    }
                 }
-                reader.Close();
             }
-            catch (Exception ex)
+            catch (SqlException ex)
             {
                 isFound = false;
-            }
-            finally
-            {
-                connection.Close();
+                clsLogger.LoggingAllExepctions(ex.Message, System.Diagnostics.EventLogEntryType.Error);
             }
             return isFound;
         }
@@ -43,29 +45,31 @@ namespace DVLD_DataAccess
         public static bool FindTypes(string title, ref int id, ref decimal fees)
         {
             bool isFound = false;
-            SqlConnection connection = new SqlConnection(clsDataAccessSettings.ConnectionString);
-            string query = "SELECT * FROM ApplicationTypes WHERE ApplicationTypesTitle = @title";
-            SqlCommand command = new SqlCommand(query, connection);
-            command.Parameters.AddWithValue("@title", title);
             try
             {
-                connection.Open();
-                SqlDataReader reader = command.ExecuteReader();
-                if (reader.Read())
+                using (SqlConnection connection = new SqlConnection(clsDataAccessSettings.ConnectionString))
                 {
-                    isFound = true;
-                    id = (int)reader["ApplicationTypesID"];
-                    fees = (decimal)reader["ApplicationFees"];
+                    using (SqlCommand command = new SqlCommand("SP_FindAppTypeByTitle", connection))
+                    {
+                        command.CommandType= CommandType.StoredProcedure;
+                        command.Parameters.AddWithValue("@title", title);
+                        connection.Open();
+                        using (SqlDataReader reader = command.ExecuteReader())
+                        {
+                            if (reader.Read())
+                            {
+                                isFound = true;
+                                id = (int)reader["ApplicationTypesID"];
+                                fees = (decimal)reader["ApplicationFees"];
+                            }
+                        }
+                    }
                 }
-                reader.Close();
             }
-            catch (Exception ex)
+            catch (SqlException ex)
             {
                 isFound = false;
-            }
-            finally
-            {
-                connection.Close();
+                clsLogger.LoggingAllExepctions(ex.Message, System.Diagnostics.EventLogEntryType.Error);
             }
             return isFound;
         }
@@ -73,49 +77,50 @@ namespace DVLD_DataAccess
         public static DataTable GetAllTypes()
         {
             DataTable dt = new DataTable();
-            SqlConnection connection = new SqlConnection(clsDataAccessSettings.ConnectionString);
-            string query = "SELECT ApplicationTypesID AS 'ID', ApplicationTypesTitle AS 'Title', ApplicationFees AS 'Fees' from ApplicationTypes";
-            SqlCommand command = new SqlCommand(query, connection);
             try
             {
-                connection.Open();
-                SqlDataReader reader = command.ExecuteReader();
-                if (reader.HasRows)
+                using (SqlConnection connection = new SqlConnection(clsDataAccessSettings.ConnectionString))
                 {
-                    dt.Load(reader);
+                    using (SqlCommand command = new SqlCommand("SP_GetAllAppTypes", connection))
+                    {
+                        command.CommandType = CommandType.StoredProcedure;
+                        connection.Open();
+                        using (SqlDataReader reader = command.ExecuteReader())
+                        {
+                            if (reader.HasRows)
+                                dt.Load(reader);
+                        }
+                    }
                 }
-                reader.Close();
             }
-            catch (Exception ex)
+            catch (SqlException ex)
             {
-            }
-            finally
-            {
-                connection.Close();
+                clsLogger.LoggingAllExepctions(ex.Message, System.Diagnostics.EventLogEntryType.Error);
             }
             return dt;
         }
         public static bool updateTypes(int id, string title, decimal fees)
         {
             int rowAffected = 0;
-            SqlConnection connection = new SqlConnection(clsDataAccessSettings.ConnectionString);
-            string query = "UPDATE ApplicationTypes SET ApplicationTypesTitle = @title, ApplicationFees = @fees WHERE ApplicationTypesID = @id";
-            SqlCommand command = new SqlCommand(query, connection);
-            command.Parameters.AddWithValue("@title", title);
-            command.Parameters.AddWithValue("@fees", fees);
-            command.Parameters.AddWithValue("@id", id);
             try
             {
-                connection.Open();
-                rowAffected = command.ExecuteNonQuery();
+                using (SqlConnection connection = new SqlConnection(clsDataAccessSettings.ConnectionString))
+                {
+                    using (SqlCommand command = new SqlCommand("SP_UpdateAppType", connection))
+                    {
+                        command.CommandType = CommandType.StoredProcedure;
+                        command.Parameters.AddWithValue("@title", title);
+                        command.Parameters.AddWithValue("@fees", fees);
+                        command.Parameters.AddWithValue("@typeId", id);
+                        connection.Open();
+                        rowAffected = command.ExecuteNonQuery();
+                    }
+                }
             }
-            catch (Exception ex)
+            catch (SqlException ex)
             {
                 rowAffected = 0;
-            }
-            finally
-            {
-                connection.Close();
+                clsLogger.LoggingAllExepctions(ex.Message, System.Diagnostics.EventLogEntryType.Error);
             }
             return rowAffected > 0;
         }

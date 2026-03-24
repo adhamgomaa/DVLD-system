@@ -10,68 +10,71 @@ namespace DVLD_DataAccess
 {
     public class clsLicenseClassData
     {
-
         public static bool FindClasses(string className, ref int id, ref string desc, ref int minAge, ref int length, ref decimal fees)
         {
             bool isFound = false;
-            SqlConnection connection = new SqlConnection(clsDataAccessSettings.ConnectionString);
-            string query = "SELECT * FROM LicenseClass WHERE ClassName = @name";
-            SqlCommand command = new SqlCommand(query, connection);
-            command.Parameters.AddWithValue("@name", className);
             try
             {
-                connection.Open();
-                SqlDataReader reader = command.ExecuteReader();
-                if (reader.Read())
+                using (SqlConnection connection = new SqlConnection(clsDataAccessSettings.ConnectionString))
                 {
-                    isFound = true;
-                    id = (int)reader["LicenseClassID"];
-                    desc = (string)reader["ClassDescription"];
-                    minAge = (int)reader["MinimumAllowedAge"];
-                    length = (int)reader["DefaultValidityLength"];
-                    fees = (decimal)reader["ClassFees"];
+                    using (SqlCommand command = new SqlCommand("SP_FindLicenseClasses", connection))
+                    {
+                        command.CommandType = CommandType.StoredProcedure;
+                        command.Parameters.AddWithValue("@className", className);
+                        connection.Open();
+                        using (SqlDataReader reader = command.ExecuteReader())
+                        {
+                            if (reader.Read())
+                            {
+                                isFound = true;
+                                id = (int)reader["LicenseClassID"];
+                                desc = (string)reader["ClassDescription"];
+                                minAge = (int)reader["MinimumAllowedAge"];
+                                length = (int)reader["DefaultValidityLength"];
+                                fees = (decimal)reader["ClassFees"];
+                            }
+                        }
+                    }
                 }
-                reader.Close();
             }
-            catch (Exception ex)
+            catch (SqlException ex)
             {
                 isFound = false;
-            }
-            finally
-            {
-                connection.Close();
+                clsLogger.LoggingAllExepctions(ex.Message, System.Diagnostics.EventLogEntryType.Error);
             }
             return isFound;
         }
         public static bool FindClasses(int id, ref string className, ref string desc, ref int minAge, ref int length, ref decimal fees)
         {
             bool isFound = false;
-            SqlConnection connection = new SqlConnection(clsDataAccessSettings.ConnectionString);
-            string query = "SELECT * FROM LicenseClass WHERE LicenseClassID = @id";
-            SqlCommand command = new SqlCommand(query, connection);
-            command.Parameters.AddWithValue("@id", id);
             try
             {
-                connection.Open();
-                SqlDataReader reader = command.ExecuteReader();
-                if (reader.Read())
+                using (SqlConnection connection = new SqlConnection(clsDataAccessSettings.ConnectionString))
                 {
-                    isFound = true;
-                    className = (string)reader["ClassName"];
-                    desc = (string)reader["ClassDescription"];
-                    minAge = (int)reader["MinimumAllowedAge"];
-                    length = (int)reader["DefaultValidityLength"];
-                    fees = (decimal)reader["ClassFees"];
+                    using (SqlCommand command = new SqlCommand("SP_FindLicenseClassesById", connection))
+                    {
+                        command.CommandType= CommandType.StoredProcedure;
+                        command.Parameters.AddWithValue("@classId", id);
+                        connection.Open();
+                        using (SqlDataReader reader = command.ExecuteReader())
+                        {
+                            if (reader.Read())
+                            {
+                                isFound = true;
+                                className = (string)reader["ClassName"];
+                                desc = (string)reader["ClassDescription"];
+                                minAge = (int)reader["MinimumAllowedAge"];
+                                length = (int)reader["DefaultValidityLength"];
+                                fees = (decimal)reader["ClassFees"];
+                            }
+                        }
+                    }
                 }
-                reader.Close();
             }
-            catch (Exception ex)
+            catch (SqlException ex)
             {
                 isFound = false;
-            }
-            finally
-            {
-                connection.Close();
+                clsLogger.LoggingAllExepctions(ex.Message, System.Diagnostics.EventLogEntryType.Error);
             }
             return isFound;
         }
@@ -79,25 +82,25 @@ namespace DVLD_DataAccess
         public static DataTable GetAllClasses()
         {
             DataTable dt = new DataTable();
-            SqlConnection connection = new SqlConnection(clsDataAccessSettings.ConnectionString);
-            string query = "SELECT * from LicenseClass";
-            SqlCommand command = new SqlCommand(query, connection);
             try
             {
-                connection.Open();
-                SqlDataReader reader = command.ExecuteReader();
-                if (reader.HasRows)
+                using (SqlConnection connection = new SqlConnection(clsDataAccessSettings.ConnectionString))
                 {
-                    dt.Load(reader);
+                    using (SqlCommand command = new SqlCommand("SP_GetAllLicenses", connection))
+                    {
+                        command.CommandType = CommandType.StoredProcedure;
+                        connection.Open();
+                        using (SqlDataReader reader = command.ExecuteReader())
+                        {
+                            if (reader.HasRows)
+                                dt.Load(reader);
+                        }
+                    }
                 }
-                reader.Close();
             }
             catch (Exception ex)
             {
-            }
-            finally
-            {
-                connection.Close();
+                clsLogger.LoggingAllExepctions(ex.Message, System.Diagnostics.EventLogEntryType.Error);
             }
             return dt;
         }

@@ -75,7 +75,7 @@ namespace DVLD_Business
 
         private bool _AddNewLicense()
         {
-            this.licenseID = clsLicenseData.AddNewLicense(driverID, appID, classID, issueDate, expiredDate, fees, notes, isActive, (byte)issueReason, userID);
+            this.licenseID = clsLicenseData.AddNewLicense(driverID, appID, classID, expiredDate, fees, notes, isActive, (byte)issueReason, userID);
             return this.licenseID != -1;
         }
 
@@ -145,7 +145,6 @@ namespace DVLD_Business
         {
             clsDetainLicense detainLicense = new clsDetainLicense();
             detainLicense.licenseID = this.licenseID;
-            detainLicense.detainDate = DateTime.Now;
             detainLicense.fees = FineFees;
             detainLicense.userID = CreatedByUserId;
             if (!detainLicense.Save())
@@ -155,22 +154,11 @@ namespace DVLD_Business
 
         public bool ReleaseLicense(int releaseByUserId, ref int releaseAppId)
         {
-            clsApp ReleaseApp = new clsApp();
-            ReleaseApp.date = DateTime.Now;
-            ReleaseApp.status = 3;
-            ReleaseApp.personId = this.driverInfo.personID;
-            ReleaseApp.types = (int)clsApp.enApplicationType.ReleaseDetainedDrivingLicsense;
-            ReleaseApp.fees = clsAppTypes.FindType(ReleaseApp.types).fees;
-            ReleaseApp.userId = releaseByUserId;
-            ReleaseApp.statusDate = DateTime.Now;
-            if(!ReleaseApp.Save())
-            {
-                releaseAppId = -1;
-                return false;
-            }
-            releaseAppId = ReleaseApp.appID;
+            releaseAppId = this.detainedLicenseInfo.ReleaseDetainedLicense(this.driverInfo.personID, 
+                (int)clsApp.enApplicationType.ReleaseDetainedDrivingLicsense, 3, DateTime.Now, 
+                clsAppTypes.FindType((int)clsApp.enApplicationType.ReleaseDetainedDrivingLicsense).fees, releaseByUserId);
 
-            return this.detainedLicenseInfo.ReleaseDetainedLicense(releaseByUserId, releaseAppId);
+            return releaseAppId != -1;
         }
 
         public clsLicense RenewLicense(string notes, int userId)
@@ -221,7 +209,6 @@ namespace DVLD_Business
                 return RenewLicense(this.notes, userId);
 
             clsApp ReplaceApp = new clsApp();
-            ReplaceApp.date = DateTime.Now;
             ReplaceApp.status = 3;
             ReplaceApp.personId = this.driverInfo.personID;
             ReplaceApp.types = enIssueReason == enIssueReason.Damaged ? (int)clsApp.enApplicationType.ReplaceDamagedDrivingLicense : (int)clsApp.enApplicationType.ReplaceLostDrivingLicense;

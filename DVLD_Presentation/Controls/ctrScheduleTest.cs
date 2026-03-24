@@ -15,7 +15,6 @@ namespace DVLD_Presentation.Controls
 {
     public partial class ctrScheduleTest : UserControl
     {
-
         enum enMode { Add, Edit }
         private enMode _mode = enMode.Add;
 
@@ -238,7 +237,6 @@ namespace DVLD_Presentation.Controls
             {
                 clsApp RetakeApp = new clsApp();
                 RetakeApp.personId = _LocalDrivingLicenseApp.personId;
-                RetakeApp.date = DateTime.Now;
                 RetakeApp.types = (int)clsApp.enApplicationType.RetakeTest;
                 RetakeApp.status = 3;
                 RetakeApp.statusDate = DateTime.Now;

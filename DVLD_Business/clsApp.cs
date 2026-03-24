@@ -61,13 +61,13 @@ namespace DVLD_Business
 
         private bool _AddNewApp()
         {
-            this.appID = clsAppData.AddNewApp(personId, date, types, status, statusDate, fees, userId);
+            this.appID = clsAppData.AddNewApp(personId, types, status, statusDate, fees, userId);
             return this.appID != -1;
         }
 
         private bool _UpdateApp()
         {
-            return clsAppData.UpdateApp(appID, personId, date, types, status, statusDate, fees, userId);
+            return clsAppData.UpdateApp(appID, personId, types, status, statusDate, fees, userId);
         }
 
         public static clsApp FindApp(int id)
@@ -85,11 +85,6 @@ namespace DVLD_Business
         public bool Delete()
         {
             return clsAppData.DeleteApp(this.appID);
-        }
-
-        public bool SetComplete()
-        {
-            return clsAppData.setComplete(this.appID, 3);
         }
 
         public bool Save()

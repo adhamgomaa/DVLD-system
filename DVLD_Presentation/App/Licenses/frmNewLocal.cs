@@ -99,7 +99,6 @@ namespace DVLD_Presentation.App.Licenses
         private void _SaveData()
         {
             _localDriving.personId = ctrlFilterPersonInfo1.PersonId;
-            _localDriving.date = DateTime.Now;
             _localDriving.types = 1;
             _localDriving.status = (int)enStatus.New;
             _localDriving.statusDate = DateTime.Now;

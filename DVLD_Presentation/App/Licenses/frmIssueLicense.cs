@@ -55,7 +55,7 @@ namespace DVLD_Presentation.App.Licenses
 
         private void btnSave_Click(object sender, EventArgs e)
         {
-            int licenseId = _localDrivingLicense.IssueLicenseForFirstTime(textBox1.Text.Trim(), clsGlobal.CurrentUser.id);
+            int licenseId = _localDrivingLicense.IssueLicenseForFirstTime(txtNotes.Text.Trim(), clsGlobal.CurrentUser.id);
 
             if(licenseId != -1)
             {

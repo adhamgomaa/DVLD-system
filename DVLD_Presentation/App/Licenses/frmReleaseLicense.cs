@@ -80,8 +80,8 @@ namespace DVLD_Presentation.App.Licenses
                 return;
             }
             lblLicense.Text = _licenseId.ToString();
-            lblDetainID.Text = ctrlFilterDriverLicense1.SelectedLicenseInfo.detainedLicenseInfo.detainID.ToString();
             lblCreate.Text = ctrlFilterDriverLicense1.SelectedLicenseInfo.detainedLicenseInfo.userID.ToString();
+            lblDetainID.Text = ctrlFilterDriverLicense1.SelectedLicenseInfo.detainedLicenseInfo.detainID.ToString();
             lblFees.Text = ctrlFilterDriverLicense1.SelectedLicenseInfo.detainedLicenseInfo.fees.ToString();
             lblAppFees.Text = clsAppTypes.FindType((int)clsApp.enApplicationType.ReleaseDetainedDrivingLicsense).fees.ToString();
             lblTotalFees.Text = Convert.ToString(Convert.ToDecimal(lblFees.Text) + Convert.ToDecimal(lblAppFees.Text));

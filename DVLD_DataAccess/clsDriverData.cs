@@ -13,28 +13,28 @@ namespace DVLD_DataAccess
         public static int AddNewDriver(int personId, DateTime createdDate, int userId)
         {
             int DriverId = -1;
-            SqlConnection connection = new SqlConnection(clsDataAccessSettings.ConnectionString);
-            string query = "Insert into Driver Values (@pId, @userId, @date); SELECT SCOPE_IDENTITY();";
-            SqlCommand command = new SqlCommand(query, connection);
-            command.Parameters.AddWithValue("@pId", personId);
-            command.Parameters.AddWithValue("@userId", userId);
-            command.Parameters.AddWithValue("@date", createdDate);
             try
             {
-                connection.Open();
-                object result = command.ExecuteScalar();
-                if (result != null && int.TryParse(result.ToString(), out int insertedId))
+                using (SqlConnection connection = new SqlConnection(clsDataAccessSettings.ConnectionString))
                 {
-                    DriverId = insertedId;
+                    using (SqlCommand command = new SqlCommand("SP_CreateNewDriver", connection))
+                    {
+                        command.CommandType = CommandType.StoredProcedure;
+                        command.Parameters.AddWithValue("@personId", personId);
+                        command.Parameters.AddWithValue("@userId", userId);
+                        SqlParameter outputId = new SqlParameter("@driverId", SqlDbType.Int);
+                        outputId.Direction = ParameterDirection.Output;
+                        command.Parameters.Add(outputId);
+                        connection.Open();
+                        command.ExecuteNonQuery();
+                        DriverId = (int)outputId.Value;
+                    }
                 }
             }
-            catch (Exception ex)
+            catch (SqlException ex)
             {
                 DriverId = -1;
-            }
-            finally
-            {
-                connection.Close();
+                clsLogger.LoggingAllExepctions(ex.Message, System.Diagnostics.EventLogEntryType.Error);
             }
             return DriverId;
         }
@@ -42,26 +42,25 @@ namespace DVLD_DataAccess
         public static DataTable ListDrivers()
         {
             DataTable dt = new DataTable();
-            SqlConnection connection = new SqlConnection(clsDataAccessSettings.ConnectionString);
-            string query = "Select * from Driver_View";
-            SqlCommand command = new SqlCommand(query, connection);
             try
             {
-                connection.Open();
-                SqlDataReader reader = command.ExecuteReader();
-                if (reader.HasRows)
+                using (SqlConnection connection = new SqlConnection(clsDataAccessSettings.ConnectionString))
                 {
-                    dt.Load(reader);
+                    using (SqlCommand command = new SqlCommand("SP_GetAllDrivers", connection))
+                    {
+                        command.CommandType = CommandType.Text;
+                        connection.Open();
+                        using (SqlDataReader reader = command.ExecuteReader())
+                        {
+                            if (reader.HasRows)
+                                dt.Load(reader);
+                        }
+                    }
                 }
-                reader.Close();
             }
-            catch (Exception ex)
+            catch (SqlException ex)
             {
-
-            }
-            finally
-            {
-                connection.Close();
+                clsLogger.LoggingAllExepctions(ex.Message, System.Diagnostics.EventLogEntryType.Error);
             }
             return dt;
         }
@@ -69,25 +68,27 @@ namespace DVLD_DataAccess
         public static bool IsPersonDriver(int personId)
         {
             bool isFound = false;
-            SqlConnection connection = new SqlConnection(clsDataAccessSettings.ConnectionString);
-            string query = "Select * from Driver Where PersonID = @id";
-            SqlCommand command = new SqlCommand(query, connection);
-            command.Parameters.AddWithValue("@id", personId);
             try
             {
-                connection.Open();
-                SqlDataReader reader = command.ExecuteReader();
-                if (reader.Read())
-                    isFound = true;
-                reader.Close();
+                using (SqlConnection connection = new SqlConnection(clsDataAccessSettings.ConnectionString))
+                {
+                    using (SqlCommand command = new SqlCommand("SP_FindDriverByPersonId", connection))
+                    {
+                        command.CommandType = CommandType.StoredProcedure;
+                        command.Parameters.AddWithValue("@personId", personId);
+                        connection.Open();
+                        using (SqlDataReader reader = command.ExecuteReader())
+                        {
+                            if (reader.Read())
+                                isFound = true;
+                        }
+                    }
+                }
             }
-            catch (Exception ex)
+            catch (SqlException ex)
             {
                 isFound = false;
-            }
-            finally
-            {
-                connection.Close();
+                clsLogger.LoggingAllExepctions(ex.Message, System.Diagnostics.EventLogEntryType.Error);
             }
             return isFound;
         }
@@ -95,30 +96,32 @@ namespace DVLD_DataAccess
         public static bool FindDriver(int personId, ref int driverId, ref int userId, ref DateTime date)
         {
             bool isFound = false;
-            SqlConnection connection = new SqlConnection(clsDataAccessSettings.ConnectionString);
-            string query = "Select * from Driver Where PersonID = @id";
-            SqlCommand command = new SqlCommand(query, connection);
-            command.Parameters.AddWithValue("@id", personId);
             try
             {
-                connection.Open();
-                SqlDataReader reader = command.ExecuteReader();
-                if (reader.Read())
+                using (SqlConnection connection = new SqlConnection(clsDataAccessSettings.ConnectionString))
                 {
-                    isFound = true;
-                    driverId = (int)reader["DriverID"];
-                    userId = (int)reader["CreatedByUserID"];
-                    date = (DateTime)reader["CreatedDate"];
+                    using (SqlCommand command = new SqlCommand("SP_FindDriverByPersonId", connection))
+                    {
+                        command.CommandType = CommandType.StoredProcedure;
+                        command.Parameters.AddWithValue("@personId", personId);
+                        connection.Open();
+                        using (SqlDataReader reader = command.ExecuteReader())
+                        {
+                            if (reader.Read())
+                            {
+                                isFound = true;
+                                driverId = (int)reader["DriverID"];
+                                userId = (int)reader["CreatedByUserID"];
+                                date = (DateTime)reader["CreatedDate"];
+                            }
+                        }
+                    }
                 }
-                reader.Close();
             }
-            catch (Exception ex)
+            catch (SqlException ex)
             {
                 isFound = false;
-            }
-            finally
-            {
-                connection.Close();
+                clsLogger.LoggingAllExepctions(ex.Message, System.Diagnostics.EventLogEntryType.Error);
             }
             return isFound;
         }
@@ -126,30 +129,32 @@ namespace DVLD_DataAccess
         public static bool FindDriver(ref int personId, int driverId, ref int userId, ref DateTime date)
         {
             bool isFound = false;
-            SqlConnection connection = new SqlConnection(clsDataAccessSettings.ConnectionString);
-            string query = "Select * from Driver Where DriverID = @id";
-            SqlCommand command = new SqlCommand(query, connection);
-            command.Parameters.AddWithValue("@id", driverId);
             try
             {
-                connection.Open();
-                SqlDataReader reader = command.ExecuteReader();
-                if (reader.Read())
+                using (SqlConnection connection = new SqlConnection(clsDataAccessSettings.ConnectionString))
                 {
-                    isFound = true;
-                    personId = (int)reader["PersonID"];
-                    userId = (int)reader["CreatedByUserID"];
-                    date = (DateTime)reader["CreatedDate"];
+                    using (SqlCommand command = new SqlCommand("SP_FindDriverById", connection))
+                    {
+                        command.CommandType = CommandType.StoredProcedure;
+                        command.Parameters.AddWithValue("@driverId", driverId);
+                        connection.Open();
+                        using (SqlDataReader reader = command.ExecuteReader())
+                        {
+                            if (reader.Read())
+                            {
+                                isFound = true;
+                                personId = (int)reader["PersonID"];
+                                userId = (int)reader["CreatedByUserID"];
+                                date = (DateTime)reader["CreatedDate"];
+                            }
+                        }
+                    }
                 }
-                reader.Close();
             }
-            catch (Exception ex)
+            catch (SqlException ex)
             {
                 isFound = false;
-            }
-            finally
-            {
-                connection.Close();
+                clsLogger.LoggingAllExepctions(ex.Message, System.Diagnostics.EventLogEntryType.Error);
             }
             return isFound;
         }
